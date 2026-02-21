@@ -1,0 +1,38 @@
+# ── secrets ─────────────────────────────────────
+.env
+.env.local
+.env.production
+
+# ── Python ─────────────────────────────────────
+__pycache__/
+*.py[cod]
+*.pyo
+*.egg-info/
+dist/
+build/
+venv/
+.venv/
+*.egg
+
+# ── SQLite database ────────────────────────────
+*.db
+*.sqlite3
+
+# ── FAISS index files ──────────────────────────
+data/*.index
+data/*.faiss
+
+# ── IDE / OS ───────────────────────────────────
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+Thumbs.db
+
+# ── Docker ─────────────────────────────────────
+*.log
+
+# ── Node (if any tooling added later) ─────────
+node_modules/

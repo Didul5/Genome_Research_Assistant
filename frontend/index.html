@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GCIQS — Genomic Query System</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+</head>
+<body>
+    <!-- background grid decoration -->
+    <div class="bg-grid"></div>
+
+    <header>
+        <div class="header-left">
+            <div class="logo-mark">
+                <svg width="28" height="28" viewBox="0 0 28 28" fill="none">
+                    <path d="M14 2C14 2 8 6 8 14C8 22 14 26 14 26C14 26 20 22 20 14C20 6 14 2 14 2Z" stroke="var(--accent)" stroke-width="1.5" fill="none"/>
+                    <path d="M2 14C2 14 6 8 14 8C22 8 26 14 26 14C26 14 22 20 14 20C6 20 2 14 2 14Z" stroke="var(--accent)" stroke-width="1.5" fill="none"/>
+                    <circle cx="14" cy="14" r="2.5" fill="var(--accent)"/>
+                </svg>
+            </div>
+            <div>
+                <h1>GCIQS</h1>
+                <p class="subtitle">Genomic Compression & Intelligent Query System</p>
+            </div>
+        </div>
+        <div class="header-right">
+            <span class="status-dot" id="statusDot"></span>
+            <span class="status-text" id="statusText">connecting...</span>
+        </div>
+    </header>
+
+    <main>
+        <!-- query input area -->
+        <section class="query-section">
+            <label for="queryInput" class="input-label">Enter genomic query</label>
+            <div class="input-row">
+                <textarea
+                    id="queryInput"
+                    placeholder="e.g., What is the impact of BRCA1 mutation c.68_69delAG?"
+                    rows="2"
+                ></textarea>
+                <button id="submitBtn" onclick="submitQuery()">
+                    <span class="btn-text">Query</span>
+                    <span class="btn-icon">→</span>
+                </button>
+            </div>
+            <div class="example-queries">
+                <span class="example-label">Try:</span>
+                <button class="example-chip" onclick="fillExample(this)">Impact of BRCA1 c.68_69delAG?</button>
+                <button class="example-chip" onclick="fillExample(this)">CRISPR targets for TP53</button>
+                <button class="example-chip" onclick="fillExample(this)">KRAS and pancreatic cancer</button>
+                <button class="example-chip" onclick="fillExample(this)">BRAF V600E targeted therapy</button>
+            </div>
+        </section>
+
+        <!-- results area -->
+        <section class="results-section" id="resultsSection">
+
+            <!-- loading state -->
+            <div class="loader" id="loader">
+                <div class="loader-helix">
+                    <div class="helix-strand strand-a"></div>
+                    <div class="helix-strand strand-b"></div>
+                </div>
+                <p class="loader-text">Retrieving genomic context<span class="dots"></span></p>
+            </div>
+
+            <!-- error state -->
+            <div class="error-box" id="errorBox">
+                <p class="error-title">⚠ Error</p>
+                <p class="error-msg" id="errorMsg"></p>
+            </div>
+
+            <!-- answer panel -->
+            <div class="answer-panel" id="answerPanel">
+                <div class="panel-header">
+                    <h2>Analysis</h2>
+                    <button class="copy-btn" onclick="copyAnswer()" title="Copy to clipboard">
+                        <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+                            <rect x="5" y="5" width="9" height="9" rx="1.5" stroke="currentColor" stroke-width="1.2"/>
+                            <path d="M3 11V3C3 2.44772 3.44772 2 4 2H11" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/>
+                        </svg>
+                    </button>
+                </div>
+                <div class="answer-content" id="answerContent"></div>
+            </div>
+
+            <!-- references panel -->
+            <div class="references-panel" id="referencesPanel">
+                <h2>Retrieved References</h2>
+                <div class="refs-grid" id="refsGrid"></div>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <p>Research prototype · Powered by Groq + FAISS hybrid retrieval · Not for clinical use</p>
+    </footer>
+
+    <script src="script.js"></script>
+</body>
+</html>
