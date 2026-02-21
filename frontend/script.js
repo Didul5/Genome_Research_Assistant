@@ -1,9 +1,5 @@
-/**
- * script.js — GCIQS frontend logic.
- *
- * Handles: query submission, SSE streaming from the backend,
- * rendering references, error states, and basic UX niceties.
- */
+
+
 
 // Use same origin — works on Vercel (same domain) and localhost
 const API_BASE = window.location.origin;
