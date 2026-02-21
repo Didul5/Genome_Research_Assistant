@@ -1,12 +1,4 @@
-"""
-main.py — FastAPI application for GCIQS.
 
-Endpoints:
-    POST /query   — accepts a genomic question, returns SSE stream
-    GET  /health  — liveness check
-
-Vercel routes /query and /health to this file via vercel.json.
-"""
 
 import json
 import os
@@ -19,7 +11,7 @@ from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import StreamingResponse, JSONResponse
 
-# Vercel runs from the repo root, so add backend/ to sys.path
+
 # so that `from retriever import ...` works regardless of cwd
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
