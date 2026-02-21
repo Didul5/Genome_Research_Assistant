@@ -1,9 +1,9 @@
-# ── secrets ─────────────────────────────────────
+# secrets — NEVER commit
 .env
 .env.local
 .env.production
 
-# ── Python ─────────────────────────────────────
+# Python
 __pycache__/
 *.py[cod]
 *.pyo
@@ -12,27 +12,21 @@ dist/
 build/
 venv/
 .venv/
-*.egg
 
-# ── SQLite database ────────────────────────────
+# SQLite
 *.db
 *.sqlite3
 
-# ── FAISS index files ──────────────────────────
-data/*.index
-data/*.faiss
-
-# ── IDE / OS ───────────────────────────────────
+# IDE / OS
 .vscode/
 .idea/
 *.swp
-*.swo
 *~
 .DS_Store
 Thumbs.db
 
-# ── Docker ─────────────────────────────────────
-*.log
+# Vercel
+.vercel/
 
-# ── Node (if any tooling added later) ─────────
-node_modules/
+# logs
+*.log

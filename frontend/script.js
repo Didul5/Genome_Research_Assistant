@@ -5,7 +5,8 @@
  * rendering references, error states, and basic UX niceties.
  */
 
-const API_BASE = "http://localhost:8000";
+// Use same origin — works on Vercel (same domain) and localhost
+const API_BASE = window.location.origin;
 
 // ── DOM refs ──────────────────────────────────────────────
 

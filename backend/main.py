@@ -5,12 +5,12 @@ Endpoints:
     POST /query   — accepts a genomic question, returns SSE stream
     GET  /health  — liveness check
 
-Run with:
-    uvicorn main:app --reload --port 8000
+Vercel routes /query and /health to this file via vercel.json.
 """
 
 import json
 import os
+import sys
 import time
 from contextlib import asynccontextmanager
 
@@ -19,10 +19,14 @@ from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import StreamingResponse, JSONResponse
 
+# Vercel runs from the repo root, so add backend/ to sys.path
+# so that `from retriever import ...` works regardless of cwd
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+
 from retriever import retriever
 from groq_client import stream_genomic_answer
 
-load_dotenv()  # pick up .env in the backend dir
+load_dotenv()
 
 
 # ── app lifecycle ──────────────────────────────────────────
@@ -34,7 +38,6 @@ async def lifespan(app: FastAPI):
     retriever.build_index()
     print("[main] ready.")
     yield
-    # shutdown: nothing to clean up
 
 
 app = FastAPI(
@@ -44,7 +47,7 @@ app = FastAPI(
     lifespan=lifespan,
 )
 
-# CORS — wide open for local dev, tighten in production
+# CORS — wide open for dev, tighten in production
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
@@ -59,7 +62,7 @@ app.add_middleware(
 async def health():
     return {
         "status": "ok",
-        "index_size": retriever.faiss_index.ntotal if retriever.faiss_index else 0,
+        "index_size": retriever.index_size,
         "timestamp": time.time(),
     }
 
@@ -113,12 +116,12 @@ async def query_endpoint(request: Request):
         headers={
             "Cache-Control": "no-cache",
             "Connection": "keep-alive",
-            "X-Accel-Buffering": "no",  # nginx sse passthrough
+            "X-Accel-Buffering": "no",
         },
     )
 
 
-# ── run directly for development ───────────────────────────
+# ── run directly for local development ─────────────────────
 
 if __name__ == "__main__":
     import uvicorn

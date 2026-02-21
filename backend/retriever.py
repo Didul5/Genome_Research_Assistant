@@ -1,21 +1,20 @@
 """
-retriever.py — Hybrid retrieval: FAISS (dense) + BM25 (sparse).
+retriever.py — Hybrid retrieval: TF-IDF (dense-ish) + BM25 (sparse).
 
-Merges results with Reciprocal Rank Fusion (RRF) to get the best
-of both worlds: semantic similarity catches paraphrases, BM25
-catches exact gene names and mutation codes the embedding model
-might fumble on.
+Merges results with Reciprocal Rank Fusion (RRF). Replaced FAISS +
+sentence-transformers with a lightweight TF-IDF vectorizer so the
+whole backend fits in Vercel's 250MB serverless function limit.
+
+BM25 catches exact gene names and mutation codes.
+TF-IDF catches broader topical similarity.
+RRF fuses both rankings into a single score.
 """
 
 import math
-import os
 import re
 from collections import defaultdict
 
-import faiss
-import numpy as np
-
-from embeddings import embed_texts, embed_query, EMBEDDING_DIM
+from embeddings import TfidfVectorizer
 from genomic_db import get_all_documents
 
 # ── BM25 (minimal implementation, no external dep) ────────
@@ -71,34 +70,34 @@ class BM25:
 
 class HybridRetriever:
     """
-    Combines FAISS (cosine similarity) and BM25 (keyword matching)
+    Combines TF-IDF (cosine similarity) and BM25 (keyword matching)
     using reciprocal rank fusion.
     """
 
     def __init__(self):
         self.documents = []
-        self.faiss_index = None
+        self.tfidf = None
         self.bm25 = None
         self._built = False
+        self.index_size = 0
 
     def build_index(self):
         """Load documents, build both indexes."""
         self.documents = get_all_documents()
         texts = [self._doc_text(d) for d in self.documents]
 
-        # FAISS — cosine similarity via inner product on L2-normalized vecs
-        print("[retriever] embedding documents ...")
-        vectors = embed_texts(texts)
-        faiss.normalize_L2(vectors)
-        self.faiss_index = faiss.IndexFlatIP(EMBEDDING_DIM)
-        self.faiss_index.add(vectors)
-        print(f"[retriever] FAISS index built: {self.faiss_index.ntotal} vectors")
+        # TF-IDF vectorizer (replaces FAISS + sentence-transformers)
+        print("[retriever] building TF-IDF index ...")
+        self.tfidf = TfidfVectorizer()
+        self.tfidf.fit(texts)
+        print(f"[retriever] TF-IDF index built: {len(texts)} docs, {len(self.tfidf.vocab)} terms")
 
         # BM25
         corpus_tokens = [_tokenize(t) for t in texts]
         self.bm25 = BM25(corpus_tokens)
         print(f"[retriever] BM25 index built: {len(corpus_tokens)} docs")
 
+        self.index_size = len(self.documents)
         self._built = True
 
     @staticmethod
@@ -113,12 +112,8 @@ class HybridRetriever:
         if not self._built:
             self.build_index()
 
-        # ── dense retrieval (FAISS) ────────────────────────
-        q_vec = embed_query(query)
-        faiss.normalize_L2(q_vec)
-        faiss_scores, faiss_ids = self.faiss_index.search(q_vec, top_k * 2)
-        # faiss_ids is (1, k), faiss_scores is (1, k)
-        dense_ranking = list(zip(faiss_ids[0].tolist(), faiss_scores[0].tolist()))
+        # ── dense-ish retrieval (TF-IDF cosine) ───────────
+        dense_ranking = self.tfidf.query(query, top_k=top_k * 2)
 
         # ── sparse retrieval (BM25) ───────────────────────
         q_tokens = _tokenize(query)
