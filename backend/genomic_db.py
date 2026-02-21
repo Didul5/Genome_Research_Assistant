@@ -1,10 +1,4 @@
-"""
-genomic_db.py — Mock genomic knowledge base.
 
-In a real system this would be backed by ClinVar, COSMIC, PubMed, etc.
-For the prototype we hardcode ~30 curated entries that cover the
-example queries well enough to demonstrate hybrid retrieval.
-"""
 
 GENOMIC_KNOWLEDGE_BASE = [
     # ── BRCA1 ──────────────────────────────────────────────
