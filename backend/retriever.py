@@ -1,14 +1,4 @@
-"""
-retriever.py — Hybrid retrieval: TF-IDF (dense-ish) + BM25 (sparse).
 
-Merges results with Reciprocal Rank Fusion (RRF). Replaced FAISS +
-sentence-transformers with a lightweight TF-IDF vectorizer so the
-whole backend fits in Vercel's 250MB serverless function limit.
-
-BM25 catches exact gene names and mutation codes.
-TF-IDF catches broader topical similarity.
-RRF fuses both rankings into a single score.
-"""
 
 import math
 import re
