@@ -1,10 +1,4 @@
-"""
-groq_client.py — Groq API integration for LLM-based genomic reasoning.
 
-Uses raw httpx instead of the groq SDK to avoid version conflicts
-(groq SDK passes `proxies=` which httpx>=0.28 removed).
-This is also more transparent — you can see exactly what hits the wire.
-"""
 
 import json
 import os
